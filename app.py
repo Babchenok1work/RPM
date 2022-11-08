@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import login_user
 from flask_security import Security, login_required, \
      SQLAlchemySessionUserDatastore
-from Forms import LoginForm,RegisterForm
+from Forms import LoginForm,RegisterForm,AddItemsForm
 from database import db_session, init_db
 from models import *
 from flask_security import Security, login_required, \
@@ -23,7 +23,8 @@ security = Security(app, user_datastore)
 @app.route("/home")
 @app.route("/")
 def index():
-    return render_template("index.html",name="alexander")
+    items=Items.query.all()
+    return render_template("index.html",items=items)
 
 @app.route("/index1")
 def index1():
@@ -66,6 +67,19 @@ def Signup():
         db_session.commit()
         return redirect('/home')
     return render_template('Signup.html', title='Sign Up', form=form)
+
+
+@app.route('/additems', methods=['GET', 'POST'])
+def AddItem():
+    form = AddItemsForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        desc = form.item_desc.data
+        item = Items(name=name,short_desc=desc)
+        db_session.add(item)
+        db_session.commit()
+        return redirect('/home')
+    return render_template('add_items.html', title='Sign Up', form=form)
 
 if __name__ == "__main__":
     app.run(debug = True)

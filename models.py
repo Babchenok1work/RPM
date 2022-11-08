@@ -10,7 +10,7 @@ class RolesUsers(Base):
     id = Column(Integer(), primary_key=True)
     user_id = Column('user_id', Integer(), ForeignKey('user.id'))
     role_id = Column('role_id', Integer(), ForeignKey('role.id'))
-
+    item_id = Column('item_id', Integer(), ForeignKey('items.id'))
 class Role(Base, RoleMixin):
     __tablename__ = 'role'
     id = Column(Integer(), primary_key=True)
@@ -32,4 +32,13 @@ class User(Base, UserMixin):
     active = Column(Boolean())
     confirmed_at = Column(DateTime())
     roles = relationship('Role', secondary='roles_users',
+                         backref=backref('users', lazy='dynamic'))
+
+
+class Items(Base):
+    __tablename__ = "items"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255))
+    short_desc = Column(String(255))
+    users = relationship('User', secondary='roles_users',
                          backref=backref('users', lazy='dynamic'))
